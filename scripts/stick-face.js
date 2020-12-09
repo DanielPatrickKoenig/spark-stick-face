@@ -56,10 +56,16 @@ Scene.root.findFirst('sizer').then(function (r) {
     mapProperty('leftEyebrowOutside', ['eyebrows', 'left', 'outside']);
     mapProperty('rightEyebrowOutside', ['eyebrows', 'right', 'outside']);
 
+    mapProperty('leftEyebrowInside', ['eyebrows', 'left', 'inside']);
+    mapProperty('rightEyebrowInside', ['eyebrows', 'right', 'inside']);
+
     Scene.root.findFirst('timeTracker').then(function (result) {
         result.worldTransform.position.x.monitor().subscribe(function (value) {
             placeBar('eyebrow_left_x', 'eyebrow_left_y', 'eyebrow_left_width', 'eyebrow_left_angle', ['eyebrows', 'left', 'top'], ['eyebrows', 'left', 'outside']);
             placeBar('eyebrow_right_x', 'eyebrow_right_y', 'eyebrow_right_width', 'eyebrow_right_angle', ['eyebrows', 'right', 'top'], ['eyebrows', 'right', 'outside']);
+
+            placeBar('inner_eyebrow_left_x', 'inner_eyebrow_left_y', 'inner_eyebrow_left_width', 'inner_eyebrow_left_angle', ['eyebrows', 'left', 'inside'], ['eyebrows', 'left', 'top']);
+            placeBar('inner_eyebrow_right_x', 'inner_eyebrow_right_y', 'inner_eyebrow_right_width', 'inner_eyebrow_right_angle', ['eyebrows', 'right', 'inside'], ['eyebrows', 'right', 'top']);
         });
 
     });
@@ -76,7 +82,6 @@ function getBetweenPoint(p1, p2){
         width: getDistance(p1.x, p1.y, p2.x, p2.y)
     }
 }
-
 function mapProperty(gameElement, propertyChain){
     Scene.root.findFirst(gameElement).then(function (result) {
         result.worldTransform.position.x.monitor().subscribe(function (value) {
