@@ -38,6 +38,18 @@ let facePoints = {
         right:{
             center: {x: 0, y: 0}
         }
+    },
+    nose: {
+        bridge: {
+            top: { x: 0, y: 0},
+            middle: {x: 0, y: 0},
+            bottom: { x: 0, y: 0}
+        },
+        nostrils: {
+            left: { x: 0, y: 0},
+            right: { x: 0, y: 0},
+            center: { x: 0, y: 0}
+        }
     }
 };
 let gameWidth = 0;
@@ -83,6 +95,10 @@ Scene.root.findFirst('sizer').then(function (r) {
     mapProperty('leftEye', ['eye', 'left', 'center']);
     mapProperty('rightEye', ['eye', 'right', 'center']);
 
+    mapProperty('noseBridge', ['nose', 'bridge', 'top']);
+    mapProperty('noseTip', ['nose', 'bridge', 'bottom']);
+    
+
     Scene.root.findFirst('timeTracker').then(function (result) {
         result.worldTransform.position.x.monitor().subscribe(function (value) {
             placeBar('eyebrow_left_x', 'eyebrow_left_y', 'eyebrow_left_width', 'eyebrow_left_angle', ['eyebrows', 'left', 'top'], ['eyebrows', 'left', 'outside']);
@@ -91,13 +107,19 @@ Scene.root.findFirst('sizer').then(function (r) {
             placeBar('inner_eyebrow_left_x', 'inner_eyebrow_left_y', 'inner_eyebrow_left_width', 'inner_eyebrow_left_angle', ['eyebrows', 'left', 'inside'], ['eyebrows', 'left', 'top']);
             placeBar('inner_eyebrow_right_x', 'inner_eyebrow_right_y', 'inner_eyebrow_right_width', 'inner_eyebrow_right_angle', ['eyebrows', 'right', 'inside'], ['eyebrows', 'right', 'top']);
 
+            facePoints.nose.nostrils.center = getBetweenPoint(facePoints.nose.nostrils.left, facePoints.nose.nostrils.right, true);
+
+            facePoints.nose.bridge.middle = getBetweenPoint(facePoints.nose.bridge.top, facePoints.nose.bridge.bottom, true);
+
+            placeBar('bridge_front_x', 'bridge_front_y', 'bridge_front_width', 'bridge_front_angle', ['nose', 'bridge', 'bottom'], ['nose', 'bridge', 'middle']);
+
             const eyeSize = {w: gameWidth * .05, h: gameWidth * .05};
 
             Patches.inputs.setScalar('left_eye_x', facePoints.eye.left.center.x - (eyeSize.w / 2));
             Patches.inputs.setScalar('left_eye_y', facePoints.eye.left.center.y - (eyeSize.h / 2));
             Patches.inputs.setScalar('right_eye_x', facePoints.eye.right.center.x - (eyeSize.w / 2));
             Patches.inputs.setScalar('right_eye_y', facePoints.eye.right.center.y - (eyeSize.h / 2));
-
+            
             Patches.inputs.setScalar('left_eye_width', eyeSize.w);
             Patches.inputs.setScalar('left_eye_height', eyeSize.h * (eyeOpenness.left + .1));
             Patches.inputs.setScalar('right_eye_width', eyeSize.w);
@@ -108,13 +130,15 @@ Scene.root.findFirst('sizer').then(function (r) {
             Patches.inputs.setScalar('left_eye_angle', (eyeAngle * -1) - 90);
             Patches.inputs.setScalar('right_eye_angle', (eyeAngle * -1) - 90);
             
+            let bridgeParams = getBetweenPoint(facePoints.nose.bridge.bottom, facePoints.nose.bridge.top, true);
+            Patches.inputs.setScalar('bridge_front_x', (bridgeParams.x - (bridgeParams.width / 2)) + connectorHeight);
             
         });
     });
 });
 
-function getBetweenPoint(p1, p2){
-    const offset =  {
+function getBetweenPoint(p1, p2, overrideOffset){
+    const offset = overrideOffset ? {x: 0, y: 0} : {
         x: p1.x > p2.x ? (p1.x - p2.x) / -2 : (p2.x - p1.x) / -2, 
         y: connectorHeight * -.5
     }
