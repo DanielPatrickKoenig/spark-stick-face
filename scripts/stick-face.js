@@ -50,6 +50,20 @@ let facePoints = {
             right: { x: 0, y: 0},
             center: { x: 0, y: 0}
         }
+    },
+    mouth: {
+        sides: {
+            left: {x: 0, y: 0},
+            right: {x: 0, y: 0}
+        },
+        lips: {
+            top: {x: 0, y: 0},
+            bottom: {x: 0, y: 0},
+            topLeft: {x: 0, y: 0},
+            topRight: {x: 0, y: 0},
+            bottomLeft: {x: 0, y: 0},
+            bottomRight: {x: 0, y: 0}
+        }
     }
 };
 let gameWidth = 0;
@@ -97,6 +111,11 @@ Scene.root.findFirst('sizer').then(function (r) {
 
     mapProperty('noseBridge', ['nose', 'bridge', 'top']);
     mapProperty('noseTip', ['nose', 'bridge', 'bottom']);
+
+    mapProperty('upperLipCenter', ['mouth', 'lips', 'top']);
+    mapProperty('lowerLipCenter', ['mouth', 'lips', 'bottom']);
+    mapProperty('mouthLeftCorner', ['mouth', 'sides', 'left']);
+    mapProperty('mouthRightCorner', ['mouth', 'sides', 'right']);
     
 
     Scene.root.findFirst('timeTracker').then(function (result) {
@@ -132,7 +151,42 @@ Scene.root.findFirst('sizer').then(function (r) {
             
             let bridgeParams = getBetweenPoint(facePoints.nose.bridge.bottom, facePoints.nose.bridge.top, true);
             Patches.inputs.setScalar('bridge_front_x', (bridgeParams.x - (bridgeParams.width / 2)) + connectorHeight);
+
+
+            const topLeftDistance = getDistance(facePoints.mouth.lips.top.x, facePoints.mouth.lips.top.y, facePoints.mouth.sides.left.x, facePoints.mouth.sides.left.y);
+            const topRightDistance = getDistance(facePoints.mouth.lips.top.x, facePoints.mouth.lips.top.y, facePoints.mouth.sides.right.x, facePoints.mouth.sides.right.y);
+
+            const bottomLeftDistance = getDistance(facePoints.mouth.lips.bottom.x, facePoints.mouth.lips.bottom.y, facePoints.mouth.sides.left.x, facePoints.mouth.sides.left.y);
+            const bottomRightDistance = getDistance(facePoints.mouth.lips.bottom.x, facePoints.mouth.lips.bottom.y, facePoints.mouth.sides.right.x, facePoints.mouth.sides.right.y);
+
+            const leftToRightAngle = getAngle(facePoints.mouth.sides.left.x, facePoints.mouth.sides.left.y, facePoints.mouth.sides.right.x, facePoints.mouth.sides.right.y);
+
+
+            facePoints.mouth.lips.topLeft = {
+                x: getOrbit(facePoints.mouth.lips.top.x, topLeftDistance / 2, leftToRightAngle, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.top.y, topLeftDistance / 2, leftToRightAngle, 'sin')
+            }
+
+            facePoints.mouth.lips.topRight = {
+                x: getOrbit(facePoints.mouth.lips.top.x, topRightDistance / 2, leftToRightAngle + 180, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.top.y, topRightDistance / 2, leftToRightAngle + 180, 'sin')
+            }
+
+            facePoints.mouth.lips.bottomLeft = {
+                x: getOrbit(facePoints.mouth.lips.top.x, bottomLeftDistance / 2, leftToRightAngle, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.top.y, bottomLeftDistance / 2, leftToRightAngle, 'sin')
+            }
+
+            facePoints.mouth.lips.bottomRight = {
+                x: getOrbit(facePoints.mouth.lips.top.x, bottomRightDistance / 2, leftToRightAngle + 180, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.top.y, bottomRightDistance / 2, leftToRightAngle + 180, 'sin')
+            }
+
+            Diagnostics.log(leftToRightAngle);
+
+            placeBar('upper_center_lip_x', 'upper_center_lip_y', 'upper_center_lip_width', 'upper_center_lip_angle', ['mouth', 'lips', 'topLeft'], ['mouth', 'lips', 'topRight']);
             
+
         });
     });
 });
@@ -191,6 +245,25 @@ function getAngle(x1, y1, x2, y2) {
     }
     else if (disty >= 0 && distx < 0) {
         resultVal = (angley * -1) - 90;
+    }
+    return resultVal;
+}
+
+function getOrbit(_center, _radius, _angle, orbitType) {
+
+    var _num1 = _center;
+    var _num2 = _radius;
+    var _num3 = _angle;
+    var theCent = _num1;
+    var radius = _num2;
+    var angle = _num3 - 90;
+    var ot = orbitType;
+    var resultVal;
+    if (ot == "cos") {
+        resultVal = theCent + (Math.cos((angle) * (Math.PI / 180)) * radius);
+    }
+    if (ot == "sin") {
+        resultVal = theCent + (Math.sin((angle) * (Math.PI / 180)) * radius);
     }
     return resultVal;
 }
