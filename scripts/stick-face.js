@@ -16,6 +16,7 @@
 // How to load in modules
 const Scene = require('Scene');
 const Patches = require('Patches');
+const FaceTracking = require('FaceTracking');
 const featureScale = -1200;
 let facePoints = {
     eyebrows: {
@@ -42,7 +43,19 @@ let facePoints = {
 let gameWidth = 0;
 let gameHeight = 0;
 let connectorHeight = 0;
+let eyeOpenness = {
+    left: 0,
+    right: 0
+}
 Scene.root.findFirst('sizer').then(function (r) {
+    FaceTracking.face(0).leftEye.openness.monitor().subscribe(function (value) {
+        // Diagnostics.log(value.newValue);
+        eyeOpenness.left = value.newValue;
+    });
+    FaceTracking.face(0).rightEye.openness.monitor().subscribe(function (value) {
+        // Diagnostics.log(value.newValue);
+        eyeOpenness.right = value.newValue;
+    });
     r.transform.position.x.monitor().subscribe(function (_value) {
         gameWidth = _value.newValue * 2;
         connectorHeight = gameWidth * .02;
@@ -86,16 +99,17 @@ Scene.root.findFirst('sizer').then(function (r) {
             Patches.inputs.setScalar('right_eye_y', facePoints.eye.right.center.y - (eyeSize.h / 2));
 
             Patches.inputs.setScalar('left_eye_width', eyeSize.w);
-            Patches.inputs.setScalar('left_eye_height', eyeSize.h);
+            Patches.inputs.setScalar('left_eye_height', eyeSize.h * (eyeOpenness.left + .1));
             Patches.inputs.setScalar('right_eye_width', eyeSize.w);
-            Patches.inputs.setScalar('right_eye_height', eyeSize.h);
+            Patches.inputs.setScalar('right_eye_height', eyeSize.h * (eyeOpenness.right + .1));
 
             const eyeAngle = getAngle(facePoints.eye.left.center.x, facePoints.eye.left.center.y, facePoints.eye.right.center.x, facePoints.eye.right.center.y);
             
             Patches.inputs.setScalar('left_eye_angle', (eyeAngle * -1) - 90);
             Patches.inputs.setScalar('right_eye_angle', (eyeAngle * -1) - 90);
+            
+            
         });
-
     });
 });
 
