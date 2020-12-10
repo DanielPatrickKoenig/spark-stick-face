@@ -29,6 +29,14 @@ let facePoints = {
             top: {x: 0, y: 0},
             inside: {x: 0, y: 0}
         }
+    },
+    eye: {
+        left:{
+            center: {x: 0, y: 0}
+        },
+        right:{
+            center: {x: 0, y: 0}
+        }
     }
 };
 let gameWidth = 0;
@@ -59,6 +67,9 @@ Scene.root.findFirst('sizer').then(function (r) {
     mapProperty('leftEyebrowInside', ['eyebrows', 'left', 'inside']);
     mapProperty('rightEyebrowInside', ['eyebrows', 'right', 'inside']);
 
+    mapProperty('leftEye', ['eye', 'left', 'center']);
+    mapProperty('rightEye', ['eye', 'right', 'center']);
+
     Scene.root.findFirst('timeTracker').then(function (result) {
         result.worldTransform.position.x.monitor().subscribe(function (value) {
             placeBar('eyebrow_left_x', 'eyebrow_left_y', 'eyebrow_left_width', 'eyebrow_left_angle', ['eyebrows', 'left', 'top'], ['eyebrows', 'left', 'outside']);
@@ -66,6 +77,23 @@ Scene.root.findFirst('sizer').then(function (r) {
 
             placeBar('inner_eyebrow_left_x', 'inner_eyebrow_left_y', 'inner_eyebrow_left_width', 'inner_eyebrow_left_angle', ['eyebrows', 'left', 'inside'], ['eyebrows', 'left', 'top']);
             placeBar('inner_eyebrow_right_x', 'inner_eyebrow_right_y', 'inner_eyebrow_right_width', 'inner_eyebrow_right_angle', ['eyebrows', 'right', 'inside'], ['eyebrows', 'right', 'top']);
+
+            const eyeSize = {w: gameWidth * .05, h: gameWidth * .05};
+
+            Patches.inputs.setScalar('left_eye_x', facePoints.eye.left.center.x - (eyeSize.w / 2));
+            Patches.inputs.setScalar('left_eye_y', facePoints.eye.left.center.y - (eyeSize.h / 2));
+            Patches.inputs.setScalar('right_eye_x', facePoints.eye.right.center.x - (eyeSize.w / 2));
+            Patches.inputs.setScalar('right_eye_y', facePoints.eye.right.center.y - (eyeSize.h / 2));
+
+            Patches.inputs.setScalar('left_eye_width', eyeSize.w);
+            Patches.inputs.setScalar('left_eye_height', eyeSize.h);
+            Patches.inputs.setScalar('right_eye_width', eyeSize.w);
+            Patches.inputs.setScalar('right_eye_height', eyeSize.h);
+
+            const eyeAngle = getAngle(facePoints.eye.left.center.x, facePoints.eye.left.center.y, facePoints.eye.right.center.x, facePoints.eye.right.center.y);
+            
+            Patches.inputs.setScalar('left_eye_angle', (eyeAngle * -1) - 90);
+            Patches.inputs.setScalar('right_eye_angle', (eyeAngle * -1) - 90);
         });
 
     });
@@ -90,7 +118,7 @@ function mapProperty(gameElement, propertyChain){
         result.worldTransform.position.y.monitor().subscribe(function (value) {
             facePoints[propertyChain[0]][propertyChain[1]][propertyChain[2]].y = (value.newValue * featureScale) + (gameHeight / 2);
         });
-    });
+    });   
 }
 
 function placeBar(xName, yName, widthName, angleName, propertyChain1, propertyChain2){
