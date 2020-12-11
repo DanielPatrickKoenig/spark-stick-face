@@ -181,7 +181,6 @@ Scene.root.findFirst('sizer').then(function (r) {
                 x: getOrbit(facePoints.mouth.lips.bottom.x, bottomRightDistance / 2, leftToRightAngle, 'cos'),
                 y: getOrbit(facePoints.mouth.lips.bottom.y, bottomRightDistance / 2, leftToRightAngle, 'sin')
             }
-
             Diagnostics.log(leftToRightAngle);
 
             placeBar('upper_center_lip_x', 'upper_center_lip_y', 'upper_center_lip_width', 'upper_center_lip_angle', ['mouth', 'lips', 'topLeft'], ['mouth', 'lips', 'topRight']);
@@ -189,6 +188,8 @@ Scene.root.findFirst('sizer').then(function (r) {
             placeBar('right_center_lip_x', 'right_center_lip_y', 'right_center_lip_width', 'right_center_lip_angle', ['mouth', 'lips', 'topRight'], ['mouth', 'sides', 'right']);
 
             placeBar('lower_center_lip_x', 'lower_center_lip_y', 'lower_center_lip_width', 'lower_center_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'lips', 'bottomRight']);
+            placeBar('left_lower_lip_x', 'left_lower_lip_y', 'left_lower_lip_width', 'left_lower_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'sides', 'left']);
+            placeBar('right_lower_lip_x', 'right_lower_lip_y', 'right_lower_lip_width', 'right_lower_lip_angle', ['mouth', 'lips', 'bottomRight'], ['mouth', 'sides', 'right']);
         });
     });
 });
@@ -216,11 +217,14 @@ function mapProperty(gameElement, propertyChain){
 }
 
 function placeBar(xName, yName, widthName, angleName, propertyChain1, propertyChain2){
+    const angleBeteen = getAngle(facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].x, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].y, facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].x,  facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].x);
+    const refactoredAgle = (angleBeteen + 360) % 180;
     let left = getBetweenPoint(facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]], facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]]);
-            Patches.inputs.setScalar(xName, left.x);
-            Patches.inputs.setScalar(yName, left.y);
-            Patches.inputs.setScalar(widthName, left.width);
-            Patches.inputs.setScalar(angleName, (getAngle(facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].x, facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].y, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].x, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].y) + 90) * -1);
+    Patches.inputs.setScalar(xName, left.x - ((left.width / 2) * (refactoredAgle / 180)) + connectorHeight);
+    // Patches.inputs.setScalar(xName, left.x);
+    Patches.inputs.setScalar(yName, left.y);
+    Patches.inputs.setScalar(widthName, left.width);
+    Patches.inputs.setScalar(angleName, (getAngle(facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].x, facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].y, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].x, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].y) + 90) * -1);
 }
 
 function getDistance(x1, y1, x2, y2) {
