@@ -126,9 +126,9 @@ Scene.root.findFirst('sizer').then(function (r) {
             placeBar('inner_eyebrow_left_x', 'inner_eyebrow_left_y', 'inner_eyebrow_left_width', 'inner_eyebrow_left_angle', ['eyebrows', 'left', 'inside'], ['eyebrows', 'left', 'top']);
             placeBar('inner_eyebrow_right_x', 'inner_eyebrow_right_y', 'inner_eyebrow_right_width', 'inner_eyebrow_right_angle', ['eyebrows', 'right', 'inside'], ['eyebrows', 'right', 'top']);
 
-            facePoints.nose.nostrils.center = getBetweenPoint(facePoints.nose.nostrils.left, facePoints.nose.nostrils.right, true);
+            facePoints.nose.nostrils.center = getBetweenPoint(facePoints.nose.nostrils.left, facePoints.nose.nostrils.right);
 
-            facePoints.nose.bridge.middle = getBetweenPoint(facePoints.nose.bridge.top, facePoints.nose.bridge.bottom, true);
+            facePoints.nose.bridge.middle = getBetweenPoint(facePoints.nose.bridge.top, facePoints.nose.bridge.bottom);
 
             placeBar('bridge_front_x', 'bridge_front_y', 'bridge_front_width', 'bridge_front_angle', ['nose', 'bridge', 'bottom'], ['nose', 'bridge', 'middle']);
 
@@ -149,8 +149,8 @@ Scene.root.findFirst('sizer').then(function (r) {
             Patches.inputs.setScalar('left_eye_angle', (eyeAngle * -1) - 90);
             Patches.inputs.setScalar('right_eye_angle', (eyeAngle * -1) - 90);
             
-            let bridgeParams = getBetweenPoint(facePoints.nose.bridge.bottom, facePoints.nose.bridge.top, true);
-            Patches.inputs.setScalar('bridge_front_x', (bridgeParams.x - (bridgeParams.width / 2)) + connectorHeight);
+            // let bridgeParams = getBetweenPoint(facePoints.nose.bridge.bottom, facePoints.nose.bridge.top, true);
+            // Patches.inputs.setScalar('bridge_front_x', (bridgeParams.x - (bridgeParams.width / 2)) + connectorHeight);
 
 
             const topLeftDistance = getDistance(facePoints.mouth.lips.top.x, facePoints.mouth.lips.top.y, facePoints.mouth.sides.left.x, facePoints.mouth.sides.left.y);
@@ -194,11 +194,9 @@ Scene.root.findFirst('sizer').then(function (r) {
     });
 });
 
-function getBetweenPoint(p1, p2, overrideOffset){
-    const offset = overrideOffset ? {x: 0, y: 0} : {
-        x: p1.x > p2.x ? (p1.x - p2.x) / -2 : (p2.x - p1.x) / -2, 
-        y: connectorHeight * -.5
-    }
+function getBetweenPoint(p1, p2){
+    
+    const offset = {x: 0, y: 0};
     return {
         x: p1.x + ((p2.x - p1.x) / 2) + offset.x,
         y: p1.y + ((p2.y - p1.y) / 2) + offset.y,
@@ -220,9 +218,9 @@ function placeBar(xName, yName, widthName, angleName, propertyChain1, propertyCh
     const angleBeteen = getAngle(facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].x, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].y, facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].x,  facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].x);
     const refactoredAgle = (angleBeteen + 360) % 180;
     let left = getBetweenPoint(facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]], facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]]);
-    Patches.inputs.setScalar(xName, left.x - ((left.width / 2) * (refactoredAgle / 180)) + connectorHeight);
-    // Patches.inputs.setScalar(xName, left.x);
-    Patches.inputs.setScalar(yName, left.y);
+    // Patches.inputs.setScalar(xName, left.x - ((left.width / 2) * (refactoredAgle / 180)) + connectorHeight);
+    Patches.inputs.setScalar(xName, left.x - (left.width / 2));
+    Patches.inputs.setScalar(yName, left.y - (left.width / 2));
     Patches.inputs.setScalar(widthName, left.width);
     Patches.inputs.setScalar(angleName, (getAngle(facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].x, facePoints[propertyChain2[0]][propertyChain2[1]][propertyChain2[2]].y, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].x, facePoints[propertyChain1[0]][propertyChain1[1]][propertyChain1[2]].y) + 90) * -1);
 }
