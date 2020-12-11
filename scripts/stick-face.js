@@ -163,32 +163,32 @@ Scene.root.findFirst('sizer').then(function (r) {
 
 
             facePoints.mouth.lips.topLeft = {
-                x: getOrbit(facePoints.mouth.lips.top.x, topLeftDistance / 2, leftToRightAngle, 'cos'),
-                y: getOrbit(facePoints.mouth.lips.top.y, topLeftDistance / 2, leftToRightAngle, 'sin')
+                x: getOrbit(facePoints.mouth.lips.top.x, topLeftDistance / 2, leftToRightAngle + 180, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.top.y, topLeftDistance / 2, leftToRightAngle + 180, 'sin')
             }
 
             facePoints.mouth.lips.topRight = {
-                x: getOrbit(facePoints.mouth.lips.top.x, topRightDistance / 2, leftToRightAngle + 180, 'cos'),
-                y: getOrbit(facePoints.mouth.lips.top.y, topRightDistance / 2, leftToRightAngle + 180, 'sin')
+                x: getOrbit(facePoints.mouth.lips.top.x, topRightDistance / 2, leftToRightAngle, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.top.y, topRightDistance / 2, leftToRightAngle, 'sin')
             }
 
             facePoints.mouth.lips.bottomLeft = {
-                x: getOrbit(facePoints.mouth.lips.bottom.x, bottomLeftDistance / 2, leftToRightAngle, 'cos'),
-                y: getOrbit(facePoints.mouth.lips.bottom.y, bottomLeftDistance / 2, leftToRightAngle, 'sin')
+                x: getOrbit(facePoints.mouth.lips.bottom.x, bottomLeftDistance / 2, leftToRightAngle + 180, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.bottom.y, bottomLeftDistance / 2, leftToRightAngle + 180, 'sin')
             }
 
             facePoints.mouth.lips.bottomRight = {
-                x: getOrbit(facePoints.mouth.lips.bottom.x, bottomRightDistance / 2, leftToRightAngle + 180, 'cos'),
-                y: getOrbit(facePoints.mouth.lips.bottom.y, bottomRightDistance / 2, leftToRightAngle + 180, 'sin')
+                x: getOrbit(facePoints.mouth.lips.bottom.x, bottomRightDistance / 2, leftToRightAngle, 'cos'),
+                y: getOrbit(facePoints.mouth.lips.bottom.y, bottomRightDistance / 2, leftToRightAngle, 'sin')
             }
 
             Diagnostics.log(leftToRightAngle);
 
             placeBar('upper_center_lip_x', 'upper_center_lip_y', 'upper_center_lip_width', 'upper_center_lip_angle', ['mouth', 'lips', 'topLeft'], ['mouth', 'lips', 'topRight']);
+            placeBar('left_center_lip_x', 'left_center_lip_y', 'left_center_lip_width', 'left_center_lip_angle', ['mouth', 'lips', 'topLeft'], ['mouth', 'sides', 'left']);
+            placeBar('right_center_lip_x', 'right_center_lip_y', 'right_center_lip_width', 'right_center_lip_angle', ['mouth', 'lips', 'topRight'], ['mouth', 'sides', 'right']);
 
             placeBar('lower_center_lip_x', 'lower_center_lip_y', 'lower_center_lip_width', 'lower_center_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'lips', 'bottomRight']);
-            
-
         });
     });
 });
