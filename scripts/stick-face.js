@@ -54,7 +54,9 @@ let facePoints = {
     mouth: {
         sides: {
             left: {x: 0, y: 0},
-            right: {x: 0, y: 0}
+            right: {x: 0, y: 0},
+            upperLeft: {x: 0, y: 0},
+            upperRight: {x: 0, y: 0}
         },
         lips: {
             top: {x: 0, y: 0},
@@ -160,6 +162,7 @@ Scene.root.findFirst('sizer').then(function (r) {
             const bottomRightDistance = getDistance(facePoints.mouth.lips.bottom.x, facePoints.mouth.lips.bottom.y, facePoints.mouth.sides.right.x, facePoints.mouth.sides.right.y);
 
             const leftToRightAngle = getAngle(facePoints.mouth.sides.left.x, facePoints.mouth.sides.left.y, facePoints.mouth.sides.right.x, facePoints.mouth.sides.right.y);
+            const leftToRightDistance = getDistance(facePoints.mouth.sides.left.x, facePoints.mouth.sides.left.y, facePoints.mouth.sides.right.x, facePoints.mouth.sides.right.y);
 
 
             facePoints.mouth.lips.topLeft = {
@@ -181,15 +184,27 @@ Scene.root.findFirst('sizer').then(function (r) {
                 x: getOrbit(facePoints.mouth.lips.bottom.x, bottomRightDistance / 2, leftToRightAngle, 'cos'),
                 y: getOrbit(facePoints.mouth.lips.bottom.y, bottomRightDistance / 2, leftToRightAngle, 'sin')
             }
-            Diagnostics.log(leftToRightAngle);
+            // Diagnostics.log(leftToRightAngle);
+
+            const frownDampening = .2;
+
+            facePoints.mouth.sides.upperLeft = {
+                x: getOrbit(facePoints.mouth.sides.left.x, leftToRightDistance * frownDampening, leftToRightAngle - 90, 'cos'),
+                y: getOrbit(facePoints.mouth.sides.left.y, leftToRightDistance * frownDampening, leftToRightAngle - 90, 'sin')
+            }
+
+            facePoints.mouth.sides.upperRight = {
+                x: getOrbit(facePoints.mouth.sides.right.x, leftToRightDistance * frownDampening, leftToRightAngle - 90, 'cos'),
+                y: getOrbit(facePoints.mouth.sides.right.y, leftToRightDistance * frownDampening, leftToRightAngle - 90, 'sin')
+            }
 
             placeBar('upper_center_lip_x', 'upper_center_lip_y', 'upper_center_lip_width', 'upper_center_lip_angle', ['mouth', 'lips', 'topLeft'], ['mouth', 'lips', 'topRight']);
-            placeBar('left_center_lip_x', 'left_center_lip_y', 'left_center_lip_width', 'left_center_lip_angle', ['mouth', 'lips', 'topLeft'], ['mouth', 'sides', 'left']);
-            placeBar('right_center_lip_x', 'right_center_lip_y', 'right_center_lip_width', 'right_center_lip_angle', ['mouth', 'lips', 'topRight'], ['mouth', 'sides', 'right']);
+            placeBar('left_center_lip_x', 'left_center_lip_y', 'left_center_lip_width', 'left_center_lip_angle', ['mouth', 'lips', 'topLeft'], ['mouth', 'sides', 'upperLeft']);
+            placeBar('right_center_lip_x', 'right_center_lip_y', 'right_center_lip_width', 'right_center_lip_angle', ['mouth', 'lips', 'topRight'], ['mouth', 'sides', 'upperRight']);
 
             placeBar('lower_center_lip_x', 'lower_center_lip_y', 'lower_center_lip_width', 'lower_center_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'lips', 'bottomRight']);
-            placeBar('left_lower_lip_x', 'left_lower_lip_y', 'left_lower_lip_width', 'left_lower_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'sides', 'left']);
-            placeBar('right_lower_lip_x', 'right_lower_lip_y', 'right_lower_lip_width', 'right_lower_lip_angle', ['mouth', 'lips', 'bottomRight'], ['mouth', 'sides', 'right']);
+            placeBar('left_lower_lip_x', 'left_lower_lip_y', 'left_lower_lip_width', 'left_lower_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'sides', 'upperLeft']);
+            placeBar('right_lower_lip_x', 'right_lower_lip_y', 'right_lower_lip_width', 'right_lower_lip_angle', ['mouth', 'lips', 'bottomRight'], ['mouth', 'sides', 'upperRight']);
         });
     });
 });
