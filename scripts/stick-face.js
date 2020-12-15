@@ -66,6 +66,20 @@ let facePoints = {
             bottomLeft: {x: 0, y: 0},
             bottomRight: {x: 0, y: 0}
         }
+    },
+    faceCorners: {
+        vertical: {
+            top: {x: 0, y: 0},
+            bottom:  {x: 0, y: 0}
+        },
+        horizontal: {
+            left: {x: 0, y: 0},
+            right: {x: 0, y: 0}
+        },
+        depth: {
+            center: {x: 0, y: 0},
+            extension: {x: 0, y: 0}
+        }
     }
 };
 let gameWidth = 0;
@@ -118,6 +132,13 @@ Scene.root.findFirst('sizer').then(function (r) {
     mapProperty('lowerLipCenter', ['mouth', 'lips', 'bottom']);
     mapProperty('mouthLeftCorner', ['mouth', 'sides', 'left']);
     mapProperty('mouthRightCorner', ['mouth', 'sides', 'right']);
+
+    mapProperty('forehead', ['faceCorners', 'vertical', 'top']);
+    mapProperty('chin', ['faceCorners', 'vertical', 'bottom']);
+    mapProperty('leftCheek', ['faceCorners', 'horizontal', 'left']);
+    mapProperty('rightCheek', ['faceCorners', 'horizontal', 'right']);
+    mapProperty('faceCenter', ['faceCorners', 'depth', 'center']);
+    mapProperty('faceExtension', ['faceCorners', 'depth', 'extension']);
     
 
     Scene.root.findFirst('timeTracker').then(function (result) {
@@ -205,6 +226,20 @@ Scene.root.findFirst('sizer').then(function (r) {
             placeBar('lower_center_lip_x', 'lower_center_lip_y', 'lower_center_lip_width', 'lower_center_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'lips', 'bottomRight']);
             placeBar('left_lower_lip_x', 'left_lower_lip_y', 'left_lower_lip_width', 'left_lower_lip_angle', ['mouth', 'lips', 'bottomLeft'], ['mouth', 'sides', 'upperLeft']);
             placeBar('right_lower_lip_x', 'right_lower_lip_y', 'right_lower_lip_width', 'right_lower_lip_angle', ['mouth', 'lips', 'bottomRight'], ['mouth', 'sides', 'upperRight']);
+
+            const faceCenter = getIntersection(facePoints.faceCorners.vertical.top, facePoints.faceCorners.horizontal.right, facePoints.faceCorners.vertical.bottom, facePoints.faceCorners.horizontal.left);
+
+            const faceSize = getDistance(facePoints.faceCorners.vertical.top.x, facePoints.faceCorners.vertical.top.y, facePoints.faceCorners.vertical.bottom.x, facePoints.faceCorners.vertical.bottom.y) * 1.5;
+
+            const faceOffset = {x: facePoints.faceCorners.depth.center.x - facePoints.faceCorners.depth.extension.x}
+
+            Patches.inputs.setScalar('face_center_x', facePoints.nose.bridge.middle.x - (faceSize/2) + (faceOffset.x * .75));
+            Patches.inputs.setScalar('face_center_y', facePoints.nose.bridge.middle.y - (faceSize/2));
+
+            Patches.inputs.setScalar('face_width', faceSize);
+            Patches.inputs.setScalar('face_height', faceSize);
+
+            Patches.inputs.setScalar('face_angle', getAngle(facePoints.faceCorners.vertical.top.x, facePoints.faceCorners.vertical.top.y, facePoints.faceCorners.vertical.bottom.x, facePoints.faceCorners.vertical.bottom.y) * -1);
         });
     });
 });
@@ -287,6 +322,40 @@ function getOrbit(_center, _radius, _angle, orbitType) {
     return resultVal;
 }
 
+function getIntersection(_tl,_tr,_br,_bl,double)
+{
+    if(double)
+    {
+        //_tl.x*=2;
+        //_tl.y*=2;
+        _tr.x*=2;
+        _tr.y*=2;
+        _br.x*=2;
+        _br.y*=2;
+        _bl.x*=2;
+        _bl.y*=2;
+    }
+    var a1 = _br.y - _tl.y;
+    var b1 = _tl.x - _br.x;
+    var a2 = _bl.y - _tr.y;
+    var b2 = _tr.x - _bl.x;
+    
+    var denom = a1 * b2 - a2 * b1;
+    //alert(_br.y);
+    //if (denom == 0) return null;
+    
+    var c1 = _br.x * _tl.y - _tl.x * _br.y;
+    var c2 = _bl.x * _tr.y - _tr.x * _bl.y;
+    
+    var p = {x:(b1 * c2 - b2 * c1)/denom, y:(a2 * c1 - a1 * c2)/denom};
+    
+    //if (getDistance(p, _br) > getDistance(_tl, _tr)) return null;
+    //if (getDistance(p, _tl) > getDistance(_tl, _tr)) return null;
+    //if (getDistance(p, _bl) > getDistance(_br, _bl)) return null;
+    //if (getDistance(p, _tr) > getDistance(_br, _bl)) return null;
+    
+    return p;
+}
 
 // Use export keyword to make a symbol available in scripting debug console
 export const Diagnostics = require('Diagnostics');
